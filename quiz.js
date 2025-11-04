@@ -42,6 +42,7 @@ const quesJSON = [
 ];
 
 let score = 0;
+const totalScore = quesJSON.length;
 let currentQuestion = 0;
 
 //Accessing all the elements:
@@ -49,7 +50,7 @@ const questionEl = document.getElementById("question");
 const optionEl = document.getElementById("options");
 const scoreEl = document.getElementById("score");
 // show initial score
-scoreEl.textContent = `Score: ${score}`;
+scoreEl.textContent = `Score: ${score} / ${totalScore}`;
 function showQuestion() {
   // Destructuring the object
   const { correctAnswer, options, question } = quesJSON[currentQuestion];
@@ -78,16 +79,18 @@ function showQuestion() {
         score -= 0.25;
       }
       // update score and move to next question
-      scoreEl.textContent = `Score: ${score}`;
+      scoreEl.textContent = `Score: ${score} / ${totalScore}`;
       nextQuestion();
     });
   });
 }
-
+const nextButton = document.getElementById("next");
+nextButton.addEventListener("click", nextQuestion);
 function nextQuestion() {
   currentQuestion++;
   if (currentQuestion >= quesJSON.length) {
     optionEl.textContent = "";
+    nextButton.style.display = "none";
     questionEl.textContent = "Quiz Completed!!";
     scoreEl.textContent = `Final Score: ${score}`;
   } else {
