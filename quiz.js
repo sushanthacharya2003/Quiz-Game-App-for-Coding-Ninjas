@@ -48,6 +48,8 @@ let currentQuestion = 0;
 const questionEl = document.getElementById("question");
 const optionEl = document.getElementById("options");
 const scoreEl = document.getElementById("score");
+// show initial score
+scoreEl.textContent = `Score: ${score}`;
 function showQuestion() {
   // Destructuring the object
   const { correctAnswer, options, question } = quesJSON[currentQuestion];
@@ -55,9 +57,13 @@ function showQuestion() {
   //Setting question text content
   questionEl.textContent = question;
 
-  const shuffledOptions = shuffleOptions(options);
+  // clone the options array before shuffling so original data isn't mutated
+  const shuffledOptions = shuffleOptions([...options]);
 
   //Populating the Options div with the buttons.
+  // clear previous options
+  optionEl.textContent = "";
+
   shuffledOptions.forEach((opt) => {
     const btn = document.createElement("button");
     btn.textContent = opt;
@@ -65,26 +71,41 @@ function showQuestion() {
 
     // Event handling on the button:
     btn.addEventListener("click", () => {
-      if (opt === correctAnswer) {
+      // compare trimmed strings to avoid issues with stray spaces
+      if (String(opt).trim() === String(correctAnswer).trim()) {
         score++;
       } else {
-        score = score - 0.25;
+        score -= 0.25;
       }
-      console.log(score);
+      // update score and move to next question
       scoreEl.textContent = `Score: ${score}`;
-      questionEl.textContent = "Quiz Completed!!";
-      optionEl.textContent = "";
+      nextQuestion();
     });
   });
+}
+
+function nextQuestion() {
+  currentQuestion++;
+  if (currentQuestion >= quesJSON.length) {
+    optionEl.textContent = "";
+    questionEl.textContent = "Quiz Completed!!";
+    scoreEl.textContent = `Final Score: ${score}`;
+  } else {
+    showQuestion();
+  }
 }
 
 //Shuffling the Options
 function shuffleOptions(options) {
   for (let i = options.length - 1; i >= 0; i--) {
-    const j = Math.floor(Math.random() * i + 1);
+    // correct Fisher-Yates index: random int from 0..i
+    const j = Math.floor(Math.random() * (i + 1));
     [options[i], options[j]] = [options[j], options[i]];
   }
   return options;
 }
 
 //   shuffleOptions([1, 2, 3, 4, 5]);
+
+// Start the quiz by showing the first question
+showQuestion();
